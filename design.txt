@@ -1,0 +1,91 @@
+Created by err0rless 2015.11.23
+Code Emulator in x86 Linux - Ubuntu 32bit
+
+typedef VIRTUAL_REGISTER
+{
+	long eax;
+	long ebx;
+	long ecx;
+	long edx;
+	long esi;
+	long edi;
+	long ebp;
+	long esp;
+	void *eip;
+} Vreg;
+
+typedef INSTRUCTION_ELEMENTS
+{
+	char insOpcode;
+	char opTypes;
+	char operand[8];
+} InsElement
+
+// OPERAND TYPE DEFINES
+#define IMMVALUE 0x10
+#define REGISTER 0x20
+#define MEMORY   0x30
+
+// REGISTER DEFINES
+#define EAX 0x00
+#define EBX 0x01
+#define ECX 0x02
+#define EDX 0x03
+#define ESI 0x04
+#define EDI 0x05
+#define EBP 0x06
+#define ESP 0x07
+#define EIP 0x08
+
+// OPCODES OF INSTRUCTIONS
+mov  0x00
+lea  0x01
+add  0x02
+sub  0x03
+mul  0x04
+div  0x05
+jmp  0x06
+call 0x07
+push 0x08
+pop  0x09
+int  0x0A
+
+we need to know length of the each instructions.
+
+insopcode oper1  oper2
+mov       $0x05, %eax
+0x00      0x05   0x00
+
+OPCODE	TYPE	OP1		OP2
+00 	21 	05000000	00000000 
+
+0x21 & 0xf0 = 0x20 = OP1_IMM
+0x21 & 0x0f = 0x01 = OP2_REG
+
+mov is 10byte.
+
+how to know oper1 is imm, oper2 is reg?
+
+
+how to operand's type?
+first   operand's type = TYPE & 0x0f
+second opernad's tpye = TYPE & 0xf0
+
+if TYPE = 0x18
+	TYPE & 0xf0 = 0x10
+	TYPE & 0x0f = 0x08
+	like this.
+
+#define OP1_REG 0x10
+#define OP1_IMM 0x20
+#define OP1_MEM 0x30
+
+#define OP2_REG 0x01
+#define OP2_IMM 0x02
+#define OP2_MEM 0x03
+
+#define OPERAND_SINGLE 0xff
+// 
+
+op ty op1      op2
+00 00 00000000 00000000
