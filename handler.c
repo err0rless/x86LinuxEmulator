@@ -17,15 +17,15 @@ int main(void)
 
 	memcpy(\
 	vmcode,  "\x00\x21\x04\x00\x00\x00\x00\x00\x00\x00" // mov $0x04, %eax
-             "\x0b\xff\x01\x00\x00\x00"                 // inc %ebx ; ebx = 1
-             "\x00\x21\x38\xa0\x04\x08\x02\x00\x00\x00" // mov $pstr, %ecx
-             "\x00\x21\x0f\x00\x00\x00\x03\x00\x00\x00" // mov $0x0f, %edx
-             "\x0a\xff\x00\x00\x00\x00"                 // int $0x80 (write pstr)
-             "\x0c\xff\x00\x00\x00\x00"                 // dec %eax
-             "\x0c\xff\x00\x00\x00\x00"                 // dec %eax
-             "\x0c\xff\x00\x00\x00\x00"                 // dec %eax
-             "\x0a\xff\x80\x00\x00\x00"                 // int $0x80 (exit(1))
-             , 66);
+	         "\x0b\xff\x01\x00\x00\x00"                 // inc %ebx ; ebx = 1
+	         "\x00\x21\x38\xa0\x04\x08\x02\x00\x00\x00" // mov $pstr, %ecx
+	         "\x00\x21\x0f\x00\x00\x00\x03\x00\x00\x00" // mov $0x0f, %edx
+	         "\x0a\xff\x00\x00\x00\x00"                 // int $0x80 (write pstr)
+	         "\x0c\xff\x00\x00\x00\x00"                 // dec %eax
+	         "\x0c\xff\x00\x00\x00\x00"                 // dec %eax
+	         "\x0c\xff\x00\x00\x00\x00"                 // dec %eax
+	         "\x0a\xff\x80\x00\x00\x00"                 // int $0x80 (exit(1))
+	         , 66);
 
 	v->eax = 0;
 	v->ebx = 0;
