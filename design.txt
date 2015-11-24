@@ -4,13 +4,7 @@ Code Emulator in x86 Linux - Ubuntu 32bit
 typedef VIRTUAL_REGISTER
 {
 	long eax;
-	long ebx;
-	long ecx;
-	long edx;
-	long esi;
-	long edi;
-	long ebp;
-	long esp;
+	... general registers ...
 	void *eip;
 } Vreg;
 
@@ -18,7 +12,8 @@ typedef INSTRUCTION_ELEMENTS
 {
 	char insOpcode;
 	char opTypes;
-	char operand[8];
+	long operand1;
+	long operand2;
 } InsElement
 
 // OPERAND TYPE DEFINES
@@ -49,6 +44,8 @@ call 0x07
 push 0x08
 pop  0x09
 int  0x0A
+inc  0x0B
+dec  0x0C
 
 we need to know length of the each instructions.
 
@@ -65,7 +62,6 @@ OPCODE	TYPE	OP1		OP2
 mov is 10byte.
 
 how to know oper1 is imm, oper2 is reg?
-
 
 how to operand's type?
 first   operand's type = TYPE & 0x0f
@@ -84,8 +80,10 @@ if TYPE = 0x18
 #define OP2_IMM 0x02
 #define OP2_MEM 0x03
 
-#define OPERAND_SINGLE 0xff
-// 
+#define OPERAND_SINGLE 0xf0
+#define SINGEL_OPE_REG 0X01
+#define SINGEL_OPE_IMM 0X02
+#define SINGEL_OPE_MEM 0X03
 
 op ty op1      op2
 00 00 00000000 00000000

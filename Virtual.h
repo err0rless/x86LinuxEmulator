@@ -52,5 +52,11 @@ typedef struct INSTRUCTION_ELEMENTS
 
 #define OPERAND_SINGLE 0xff
 
-void mov(char type, Vreg *v, InsElement *ins);
-void intt(char type, Vreg *v, InsElement *ins);
+// error, print handler
+unsigned int pError(const char *eMsg);
+
+// INSTRUCTION HANDLERS
+void mov(char type, Vreg *v, InsElement ins);
+void intt(char type, Vreg *v, InsElement ins);
+void inc(char type, Vreg *v, InsElement ins);
+void dec(char type, Vreg *v, InsElement ins);
