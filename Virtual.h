@@ -4,14 +4,7 @@
 // STRUCT OF VIRTUAL-PROCESSOR
 typedef struct VIRTUAL_REGISTER
 {
-	long eax;
-	long ebx;
-	long ecx;
-	long edx;
-	long esi;
-	long edi;
-	long ebp;
-	long esp;
+	long reg[8]; // general registers eax ... esp
 	void *eip;
 } Vreg;
 
@@ -28,7 +21,6 @@ typedef struct INSTRUCTION_ELEMENTS
 #define IMM      0x10
 #define REGISTER 0x20
 #define MEMORY   0x30
-#define PMEMORY  0x40
 
 // REGISTER DEFINES
 #define EAX 0x00
@@ -41,6 +33,16 @@ typedef struct INSTRUCTION_ELEMENTS
 #define ESP 0x07
 #define EIP 0x08
 
+#define eax 0x00
+#define ebx 0x01
+#define ecx 0x02
+#define edx 0x03
+#define esi 0x04
+#define edi 0x05
+#define ebp 0x06
+#define esp 0x07
+//#define eip 0x08
+
 // TPYE OF OPERANDS
 #define OP1_REG 0x10
 #define OP1_IMM 0x20
@@ -50,7 +52,10 @@ typedef struct INSTRUCTION_ELEMENTS
 #define OP2_IMM 0x02
 #define OP2_MEM 0x03
 
-#define OPERAND_SINGLE 0xff
+#define OPERAND_SINGLE 0xf0
+#define SINGLE_IMM     0x00
+#define SINGLE_REG     0x01
+#define SINGLE_PMEMORY 0x02
 
 // error, print handler
 unsigned int pError(const char *eMsg);

@@ -10,7 +10,7 @@ void setOpcode(void (*insList[0xff])(char type, Vreg *v, InsElement ins))
 	insList[0x0c] = dec;
 }
 
-void pError(const char *eMsg)
+unsigned int pError(const char *eMsg)
 {
 	return write(2, eMsg, strlen(eMsg));
 }
@@ -23,53 +23,57 @@ void mov(char type, Vreg *v, InsElement ins)
 	printf("ins.operand1 : %ld\n", ins.operand1);
 	printf("ins.operand2 : %ld\n\n", ins.operand2);
 
+	if (OP2_TYPE == OP2_IMM)
+	{
+		pError("mov::Invalid Operand2 OP2_IMM");
+		return ;
+	}
+
 	switch (OP1_TYPE)
 	{
 	case OP1_REG:
-		// not yet
+		switch (OP2_TYPE)
+		{
+		case OP2_REG:
+			v->reg[(int)ins.operand2] = v->reg[(int)ins.operand1];
+			break;
+		case OP2_MEM:
+			*(ins.operand2) = v->reg[(int)ins.operand1];
+			break;
+		default: 
+			pError("mov::Invalid Operand2's type");
+			break;
+		}
 		break;
 
 	case OP1_IMM:
-
 		switch (OP2_TYPE)
 		{
-		case OP2_IMM:
-			// not yet
-			break;
 		case OP2_REG:
-
-			switch ((int)ins.operand2)
-			{
-			case EAX:
-				v->eax = ins.operand1; break;
-			case EBX:
-				v->ebx = ins.operand1; break;
-			case ECX:
-				v->ecx = ins.operand1; break;
-			case EDX:
-				v->edx = ins.operand1; break;
-			case ESI:
-				v->esi = ins.operand1; break;
-			case EDI:
-				v->edi = ins.operand1; break;
-			case EBP:
-				v->ebp = ins.operand1; break;
-			case ESP: 
-				v->esp = ins.operand1; break;
-			case EIP:
-				pError("register EIP is not writable");
-			default: break; // not yet
-			}
-			
+			v->reg[(int)ins.operand2] = ins.operand1;
 			break;
 		case OP2_MEM:
-			// not yet
+			*(ins.operand2) = ins.operand1;
+			break;
+		default: 
+			pError("mov::Invalid Operand2's type");
 			break;
 		}
 		break;
 
 	case OP1_MEM:
-		// not yet
+		switch (OP2_TYPE)
+		{
+		case OP2_REG:
+			v->reg[(int)ins.operand2] = *(ins.operand1);
+			break;
+		case OP2_MEM:
+			*(ins.operand2) = *(ins.operand1);
+			break;
+		default: 
+			pError("mov::Invalid Operand2's type");
+			break;
+		}
 		break;
 	}
 
@@ -79,46 +83,50 @@ void mov(char type, Vreg *v, InsElement ins)
 
 void intt(char type, Vreg *v, InsElement ins)
 {
-	printf("in intt eax : 0x%lx\n", v->eax);
-	printf("in intt ebx : 0x%lx\n", v->ebx);
-	printf("in intt ecx : 0x%lx\n", v->ecx);
-	printf("in intt edx : 0x%lx\n\n", v->edx);
+	printf("in intt eax : 0x%lx\n", v->reg[eax]);
+	printf("in intt ebx : 0x%lx\n", v->reg[ebx]);
+	printf("in intt ecx : 0x%lx\n", v->reg[ecx]);
+	printf("in intt edx : 0x%lx\n\n", v->reg[edx]);
+
+	char int_num[30];
+
+	switch (type & 0x0f)
+	{
+	case SINGLE_IMM:
+	case SINGLE_PMEMORY:
+		strcpy(int_num, "$");
+		break;
+	case SINGLE_REG:
+		strcpy(int_num, "%%");
+		break;
+	default: 
+		pError("intt::Invalid Operand1's type");
+		break;
+	}
+	
+	sprintf(int_num, "%s%d\n\t", int_num, ins.operand1);
+
+	char assm[1024];
+	strcpy(assm, "mov %0, %%eax\n\t");
+	strcat(assm, "mov %1, %%edx\n\t");
+	strcat(assm, "mov %2, %%ecx\n\t");
+	strcat(assm, "mov %3, %%ebx\n\t");
+	strcat(assm, int_num);
 
 	__asm__
-	(
-		"mov %0, %%eax\n\t"
-		"mov %1, %%edx\n\t"
-		"mov %2, %%ecx\n\t"
-		"mov %3, %%ebx\n\t"
-		"int $0x80"
+	(	assm,
 		: /* No outputs */
-		: "m"(v->eax), "m"(v->edx), "m"(v->ecx), "m"(v->ebx)
+		: "m"(v->reg[eax]), "m"(v->reg[edx]), "m"(v->reg[ecx]), "m"(v->reg[ebx])
 	);
 
 	v->eip += 6;
 }
 
-
 void inc(char type, Vreg *v, InsElement ins)
 {
 	printf("in inc...\n");
 
-	switch ((int)ins.operand1)
-	{
-	case EAX:
-		v->eax += 1; break;
-	case EBX:
-		v->ebx += 1; break;
-	case ECX:
-		v->ecx += 1; break;
-	case EDX:
-		v->edx += 1; break;
-	case ESI:
-		v->esi += 1; break;
-	case EDI:
-		v->edi += 1; break;
-	default: break;
-	}
+	v->reg[(int)ins.operand1] += 1;
 
 	v->eip += 6;
 }
@@ -127,22 +135,7 @@ void dec(char type, Vreg *v, InsElement ins)
 {
 	printf("in dec...\n");
 
-	switch((int)ins.operand1)
-	{
-	case EAX:
-		v->eax -= 1; break;
-	case EBX:
-		v->ebx -= 1; break;
-	case ECX:
-		v->ecx -= 1; break;
-	case EDX:
-		v->edx -= 1; break;
-	case ESI:
-		v->esi -= 1; break;
-	case EDI:
-		v->edi -= 1; break;
-	default: break;
-	}
+	v->reg[(int)ins.operand1] -= 1;
 
 	v->eip += 6;
 }
