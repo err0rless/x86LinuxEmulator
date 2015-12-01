@@ -21,8 +21,9 @@ void chkReg(long value, Vreg *v)
 
 void pError(const char *eMsg, Vreg *v)
 {
-	char eipMsg[32];
-	sprintf(eipMsg, "Error occured at 0x%x\n", (int)v->eip);
+	char eipMsg[128];
+	sprintf(eipMsg, "[!] Error occured at 0x%x", (int)v->eip);
+	sprintf(eipMsg, "%s {baseaddr + 0x%lx}\n", eipMsg, v->offset);
 
 	write(2, eipMsg, strlen(eipMsg));
 	write(2, eMsg, strlen(eMsg));
@@ -34,21 +35,21 @@ void mov(char type, Vreg *v, InsElement ins)
 	char OP1_TYPE = type & 0xf0;
 	char OP2_TYPE = type & 0x0f;
 
-	printf("ins.operand1 : %ld\n", ins.operand1);
-	printf("ins.operand2 : %ld\n\n", ins.operand2);
+	//printf("ins.operand1 : %ld\n", ins.operand1);
+	//printf("ins.operand2 : %ld\n\n", ins.operand2);
 
 
 	switch (OP1_TYPE)
 	{
 	case OP1_REG:
 		chkReg(ins.operand1, v);
-		v->reg[tm1] = v->reg[ins.operand1];
+		v->reg[tmp] = v->reg[ins.operand1];
 		break;
 	case OP1_IMM:
-		v->reg[tm1] = ins.operand1;
+		v->reg[tmp] = ins.operand1;
 		break;
 	case OP1_MEM:
-		v->reg[tm1] = *(int *)ins.operand1;
+		v->reg[tmp] = *(int *)ins.operand1;
 		break;
 	default:
 		pError("mov::Invalid Operand type\n", v);
@@ -61,10 +62,10 @@ void mov(char type, Vreg *v, InsElement ins)
 		pError("mov::Invalid Operand type\n", v);
 	case OP2_REG:
 		chkReg(ins.operand2, v);
-		v->reg[ins.operand2] = v->reg[tm1];
+		v->reg[ins.operand2] = v->reg[tmp];
 		break;
 	case OP2_MEM:
-		*(int *)ins.operand2 = v->reg[tm1];
+		*(int *)ins.operand2 = v->reg[tmp];
 		break;
 	default:
 		pError("mov::Invalid Operand type\n", v);
@@ -77,10 +78,10 @@ void mov(char type, Vreg *v, InsElement ins)
 
 void intt(char type, Vreg *v, InsElement ins)
 {
-	printf("in intt eax : 0x%lx\n", v->reg[eax]);
-	printf("in intt ebx : 0x%lx\n", v->reg[ebx]);
-	printf("in intt ecx : 0x%lx\n", v->reg[ecx]);
-	printf("in intt edx : 0x%lx\n\n", v->reg[edx]);
+	//printf("in intt eax : 0x%lx\n", v->reg[eax]);
+	//printf("in intt ebx : 0x%lx\n", v->reg[ebx]);
+	//printf("in intt ecx : 0x%lx\n", v->reg[ecx]);
+	//printf("in intt edx : 0x%lx\n\n", v->reg[edx]);
 
 	__asm__
 	(	"mov %0, %%eax\n\t"
@@ -146,13 +147,13 @@ void cmp(char type, Vreg *v, InsElement ins)
 	{
 	case OP1_REG:
 		chkReg(ins.operand1, v);
-		v->reg[tm1] = v->reg[ins.operand1];
+		v->reg[tmp] = v->reg[ins.operand1];
 		break;
 	case OP1_IMM:
-		v->reg[tm1] = ins.operand1;
+		v->reg[tmp] = ins.operand1;
 		break;
 	case OP1_MEM:
-		v->reg[tm1] = *(int *)ins.operand1;
+		v->reg[tmp] = *(int *)ins.operand1;
 		break;
 	default:
 		pError("cmp::Invalid Operand type\n", v);
@@ -163,13 +164,13 @@ void cmp(char type, Vreg *v, InsElement ins)
 	{
 	case OP2_REG:
 		chkReg(ins.operand2, v);
-		v->flag[ZF] = !(v->reg[tm1] == v->reg[ins.operand2]);
+		v->flag[ZF] = !(v->reg[tmp] == v->reg[ins.operand2]);
 		break;
 	case OP2_IMM:
-		v->flag[ZF] = !(v->reg[tm1] == ins.operand2);
+		v->flag[ZF] = !(v->reg[tmp] == ins.operand2);
 		break;
 	case OP2_MEM:
-		v->flag[ZF] = !(v->reg[tm1] == *(int *)ins.operand2);
+		v->flag[ZF] = !(v->reg[tmp] == *(int *)ins.operand2);
 		break;
 	default:
 		pError("cmp::Invalid Operand2 type\n", v);

@@ -4,9 +4,11 @@
 // STRUCT OF VIRTUAL-PROCESSOR
 typedef struct VIRTUAL_REGISTER
 {
-	long reg[8];   // general registers eax ... esp
+	long reg[9];   // general registers eax ... esp, tmp
 	long flag[11]; // status flag registers CF ... OF
-	void *eip;
+	void *eip;     // base + now
+	void *base;    // vmcode + 0
+	long offset;   // &eip - &base
 } Vreg;
 
 // STRUCT OF INSTRUCTION
@@ -17,6 +19,11 @@ typedef struct INSTRUCTION_ELEMENTS
 	long operand1;
 	long operand2;
 } InsElement;
+
+// some
+#define REGNUM  0x09
+#define FLAGNUM 0x0B
+
 
 // OPERAND TYPE DEFINES
 #define IMM      0x10
@@ -33,8 +40,7 @@ typedef struct INSTRUCTION_ELEMENTS
 #define EBP 0x06
 #define ESP 0x07
 #define EIP 0x08
-#define TM1 0x09
-#define TM2 0x0a
+#define tmp 0x09
 
 #define eax 0x00
 #define ebx 0x01
@@ -45,8 +51,7 @@ typedef struct INSTRUCTION_ELEMENTS
 #define ebp 0x06
 #define esp 0x07
 // eip...
-#define tm1 0x09
-#define tm2 0x0a
+#define tmp 0x09
 
 // FLAG REGISTER DEFINES
 #define CF 0x00

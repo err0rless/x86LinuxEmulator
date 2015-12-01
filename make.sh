@@ -1,4 +1,6 @@
 #/bin/bash
+clear
+
 gcc -c *.c -std=c11
 
 #python generateOpcodes.py > opcode.tmp
@@ -6,5 +8,5 @@ gcc -c *.c -std=c11
 
 gcc -o main *.o
 
-#rm -rf *.o
+rm -rf *.o
 #rm -rf opcode.tmp
