@@ -4,7 +4,8 @@
 // STRUCT OF VIRTUAL-PROCESSOR
 typedef struct VIRTUAL_REGISTER
 {
-	long reg[8]; // general registers eax ... esp
+	long reg[8];   // general registers eax ... esp
+	long flag[11]; // status flag registers CF ... OF
 	void *eip;
 } Vreg;
 
@@ -22,7 +23,7 @@ typedef struct INSTRUCTION_ELEMENTS
 #define REGISTER 0x20
 #define MEMORY   0x30
 
-// REGISTER DEFINES
+// GENERAL REGISTER DEFINES
 #define EAX 0x00
 #define EBX 0x01
 #define ECX 0x02
@@ -32,6 +33,8 @@ typedef struct INSTRUCTION_ELEMENTS
 #define EBP 0x06
 #define ESP 0x07
 #define EIP 0x08
+#define TM1 0x09
+#define TM2 0x0a
 
 #define eax 0x00
 #define ebx 0x01
@@ -41,7 +44,20 @@ typedef struct INSTRUCTION_ELEMENTS
 #define edi 0x05
 #define ebp 0x06
 #define esp 0x07
-//#define eip 0x08
+// eip...
+#define tm1 0x09
+#define tm2 0x0a
+
+// FLAG REGISTER DEFINES
+#define CF 0x00
+#define PF 0x01
+#define AF 0x02
+#define ZF 0x03
+#define SF 0x04
+#define TF 0x05
+#define IF 0x06
+#define DF 0x07
+#define OF 0x08
 
 // TPYE OF OPERANDS
 #define OP1_REG 0x10
@@ -53,15 +69,17 @@ typedef struct INSTRUCTION_ELEMENTS
 #define OP2_MEM 0x03
 
 #define OPERAND_SINGLE 0xf0
-#define SINGLE_IMM     0x00
-#define SINGLE_REG     0x01
-#define SINGLE_PMEMORY 0x02
+#define SINGLE_REG     0x00
+#define SINGLE_IMM     0x01
+#define SINGLE_MEMORY  0x02
 
 // error, print handler
-unsigned int pError(const char *eMsg);
+void pError(const char *eMsg, Vreg *v);
+void chkReg(long value, Vreg *vs);
 
 // INSTRUCTION HANDLERS
-void mov(char type, Vreg *v, InsElement ins);
+void mov (char type, Vreg *v, InsElement ins);
 void intt(char type, Vreg *v, InsElement ins);
-void inc(char type, Vreg *v, InsElement ins);
-void dec(char type, Vreg *v, InsElement ins);
+void inc (char type, Vreg *v, InsElement ins);
+void dec (char type, Vreg *v, InsElement ins);
+void cmp (char type, Vreg *v, InsElement ins);
